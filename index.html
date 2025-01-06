@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Makdo-ماكدو</title>
+  <style>
+    /* الخطوط والألوان */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #fffbea;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #ffcc00;
+      color: black;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #ffcc00;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .branch {
+      background-color: #fff7cc;
+      border: 2px solid #ffcc00;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgb(0, 0, 0);
+      text-align: center;
+    }
+
+    .branch h4 {
+      color: rgb(0, 0, 0);
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul li {
+      padding: 10px;
+      margin-bottom: 5px;
+      background-color: #fffdfa;
+      border: 1px solid #ffcc00;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+    }
+
+    .size-info {
+      display: flex;
+      justify-content: flex-end; /* محاذاة الأسعار لليمين */
+      width: 100%;
+      gap: 10px; /* المسافة بين الأسعار */
+    }
+
+    .price {
+      font-size: 18px; /* حجم صغير للسعر */
+      color: #000000;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #ffcc00;
+      color: black;
+      margin-top: 20px;
+    }
+
+    footer a {
+      color: black;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    footer a:hover {
+      color: #ffa500;
+    }
+  </style>
+</head>
+<body>
+  <header>Makdo-ماكدو</header>
+  <main>
+    <h1>الاصناف</h1>
+    <div id="menuContainer"></div>
+  </main>
+  <footer>
+    Powered by <a href="https://www.instagram.com/mk_coder/" target="_blank">Mahmoud Khaled</a>. © 2025
+  </footer>
+
+  <script>
+    // استرجاع البيانات من Local Storage
+    function getData() {
+      return JSON.parse(localStorage.getItem('menuData')) || {};
+    }
+
+    // عرض المنيو
+    function renderMenu() {
+      const menuData = getData();
+      const container = document.getElementById('menuContainer');
+      container.innerHTML = '';
+
+      Object.keys(menuData).forEach(branchName => {
+        const branchDiv = document.createElement('div');
+        branchDiv.className = 'branch';
+
+        const branchTitle = document.createElement('h4');
+        branchTitle.textContent = branchName;
+
+        const itemList = document.createElement('ul');
+        menuData[branchName].forEach(item => {
+          const listItem = document.createElement('li');
+          
+          // بناء النصوص الخاصة بكل حجم وسعره
+          const sizeInfo = item.sizes.map(size => {
+            return `<span>${size.size} <span class="price">(${size.price} جنيه)</span></span>`;
+          }).join(' | ');
+
+          listItem.innerHTML = `
+            <span style="flex: 1; text-align: left;">${item.name}</span>
+            <div class="size-info">${sizeInfo}</div>
+          `;
+          itemList.appendChild(listItem);
+        });
+
+        branchDiv.appendChild(branchTitle);
+        branchDiv.appendChild(itemList);
+        container.appendChild(branchDiv);
+      });
+    }
+
+    // تشغيل عند تحميل الصفحة
+    renderMenu();
+  </script>
+</body>
+</html>

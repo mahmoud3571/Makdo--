@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة المنيو</title>
+  <style>
+    /* الخطوط والألوان */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #fffbea;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #ffcc00;
+      color: black;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1, h3 {
+      color: #ffcc00;
+      text-transform: uppercase;
+    }
+
+    input, button {
+      margin: 5px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #ffcc00;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #ffa500;
+    }
+
+    button {
+      background-color: #ffcc00;
+      color: black;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #ffa500;
+    }
+
+    .branch {
+      background-color: #fff7cc;
+      border: 2px solid #ffcc00;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .branch h4 {
+      color: black;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul li {
+      padding: 10px;
+      margin-bottom: 5px;
+      background-color: #fffdfa;
+      border: 1px solid #ffcc00;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    ul li button {
+      margin-left: 10px;
+      font-size: 14px;
+      padding: 5px 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #ffcc00;
+      color: black;
+      margin-top: 20px;
+    }
+
+    footer a {
+      color: black;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+
+    footer a:hover {
+      color: #ffa500;
+    }
+  </style>
+</head>
+<body>
+  <header>إدارة المنيو 🍴</header>
+  <main>
+    <!-- إضافة فرع جديد -->
+    <section>
+      <h3>إضافة فرع جديد</h3>
+      <input type="text" id="branchName" placeholder="اسم الفرع">
+      <button onclick="addBranch()">إضافة فرع</button>
+    </section>
+
+    <!-- قائمة الفروع -->
+    <div id="branchesContainer"></div>
+  </main>
+  <footer>
+    Powered by <a href="https://www.instagram.com/mk_coder/" target="_blank">Mahmoud Khaled</a>. © 2025
+  </footer>
+
+  <script>
+    // حفظ البيانات في Local Storage
+    function saveData(data) {
+      localStorage.setItem('menuData', JSON.stringify(data));
+    }
+
+    // استرجاع البيانات من Local Storage
+    function getData() {
+      return JSON.parse(localStorage.getItem('menuData')) || {};
+    }
+
+    // إضافة فرع جديد
+    function addBranch() {
+      const branchName = document.getElementById('branchName').value.trim();
+      if (!branchName) {
+        alert('يرجى إدخال اسم الفرع!');
+        return;
+      }
+
+      const menuData = getData();
+      if (menuData[branchName]) {
+        alert('هذا الفرع موجود بالفعل!');
+        return;
+      }
+
+      menuData[branchName] = [];
+      saveData(menuData);
+      renderBranches();
+    }
+
+    // تعديل اسم الفرع
+    function editBranch(branchName) {
+      const newBranchName = prompt("ادخل اسم الفرع الجديد:", branchName);
+      if (newBranchName && newBranchName !== branchName) {
+        const menuData = getData();
+        menuData[newBranchName] = menuData[branchName];
+        delete menuData[branchName];
+        saveData(menuData);
+        renderBranches();
+      }
+    }
+
+    // حذف فرع
+    function deleteBranch(branchName) {
+      const menuData = getData();
+      delete menuData[branchName];
+      saveData(menuData);
+      renderBranches();
+    }
+
+    // إضافة صنف جديد مع حجمين وسعرين
+    function addMenuItem(branchName) {
+      const itemName = document.getElementById(`itemInput-${branchName}`).value.trim();
+      const sizeSmall = document.getElementById(`sizeSmall-${branchName}`).value.trim();
+      const priceSmall = document.getElementById(`priceSmall-${branchName}`).value.trim();
+      const sizeLarge = document.getElementById(`sizeLarge-${branchName}`).value.trim();
+      const priceLarge = document.getElementById(`priceLarge-${branchName}`).value.trim();
+
+      if (!itemName || !sizeSmall || !priceSmall || !sizeLarge || !priceLarge || isNaN(priceSmall) || isNaN(priceLarge)) {
+        alert('يرجى إدخال جميع البيانات بشكل صحيح!');
+        return;
+      }
+
+      const menuData = getData();
+      menuData[branchName].push({
+        name: itemName,
+        sizes: [
+          { size: sizeSmall, price: parseFloat(priceSmall).toFixed(2) },
+          { size: sizeLarge, price: parseFloat(priceLarge).toFixed(2) }
+        ]
+      });
+      saveData(menuData);
+      renderBranches();
+    }
+
+    // تعديل صنف
+    function editMenuItem(branchName, itemIndex) {
+      const menuData = getData();
+      const item = menuData[branchName][itemIndex];
+      
+      const newName = prompt("ادخل اسم الصنف الجديد:", item.name);
+      if (newName) item.name = newName;
+
+      const newSizeSmall = prompt("ادخل الحجم الصغير الجديد:", item.sizes[0].size);
+      if (newSizeSmall) item.sizes[0].size = newSizeSmall;
+
+      const newPriceSmall = prompt("ادخل السعر للحجم الصغير الجديد:", item.sizes[0].price);
+      if (newPriceSmall) item.sizes[0].price = newPriceSmall;
+
+      const newSizeLarge = prompt("ادخل الحجم الكبير الجديد:", item.sizes[1].size);
+      if (newSizeLarge) item.sizes[1].size = newSizeLarge;
+
+      const newPriceLarge = prompt("ادخل السعر للحجم الكبير الجديد:", item.sizes[1].price);
+      if (newPriceLarge) item.sizes[1].price = newPriceLarge;
+
+      saveData(menuData);
+      renderBranches();
+    }
+
+    // حذف صنف
+    function deleteMenuItem(branchName, itemIndex) {
+      const menuData = getData();
+      menuData[branchName].splice(itemIndex, 1);
+      saveData(menuData);
+      renderBranches();
+    }
+
+    // عرض الفروع والأصناف مع أزرار التعديل والحذف
+    function renderBranches() {
+      const menuData = getData();
+      const container = document.getElementById('branchesContainer');
+      container.innerHTML = '';
+
+      Object.keys(menuData).forEach(branchName => {
+        const branchDiv = document.createElement('div');
+        branchDiv.id = `branchDiv-${branchName}`;
+        branchDiv.className = 'branch';
+
+        const branchTitle = document.createElement('h4');
+        branchTitle.textContent = branchName;
+
+        const editBranchButton = document.createElement('button');
+        editBranchButton.textContent = 'تعديل الفرع';
+        editBranchButton.onclick = () => editBranch(branchName);
+
+        const deleteBranchButton = document.createElement('button');
+        deleteBranchButton.textContent = 'حذف الفرع';
+        deleteBranchButton.onclick = () => {
+          if (confirm(`هل أنت متأكد أنك تريد حذف الفرع "${branchName}"؟`)) {
+            deleteBranch(branchName);
+          }
+        };
+
+        const itemInput = document.createElement('input');
+        itemInput.id = `itemInput-${branchName}`;
+        itemInput.placeholder = `إضافة صنف في ${branchName}`;
+
+        const sizeSmallInput = document.createElement('input');
+        sizeSmallInput.id = `sizeSmall-${branchName}`;
+        sizeSmallInput.placeholder = 'حجم صغير';
+
+        const priceSmallInput = document.createElement('input');
+        priceSmallInput.id = `priceSmall-${branchName}`;
+        priceSmallInput.placeholder = 'السعر للحجم الصغير';
+        priceSmallInput.type = 'number';
+        priceSmallInput.min = '0';
+
+        const sizeLargeInput = document.createElement('input');
+        sizeLargeInput.id = `sizeLarge-${branchName}`;
+        sizeLargeInput.placeholder = 'حجم كبير';
+
+        const priceLargeInput = document.createElement('input');
+        priceLargeInput.id = `priceLarge-${branchName}`;
+        priceLargeInput.placeholder = 'السعر للحجم الكبير';
+        priceLargeInput.type = 'number';
+        priceLargeInput.min = '0';
+
+        const addItemButton = document.createElement('button');
+        addItemButton.textContent = 'إضافة صنف';
+        addItemButton.onclick = () => addMenuItem(branchName);
+
+        const itemList = document.createElement('ul');
+        itemList.id = `itemList-${branchName}`;
+        menuData[branchName].forEach((item, index) => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            ${item.name} - صغير (${item.sizes[0].price} جنيه) / كبير (${item.sizes[1].price} جنيه)
+            <button onclick="editMenuItem('${branchName}', ${index})">تعديل</button>
+            <button onclick="deleteMenuItem('${branchName}', ${index})">حذف</button>
+          `;
+          itemList.appendChild(listItem);
+        });
+
+        branchDiv.appendChild(branchTitle);
+        branchDiv.appendChild(editBranchButton);
+        branchDiv.appendChild(deleteBranchButton);
+        branchDiv.appendChild(itemInput);
+        branchDiv.appendChild(sizeSmallInput);
+        branchDiv.appendChild(priceSmallInput);
+        branchDiv.appendChild(sizeLargeInput);
+        branchDiv.appendChild(priceLargeInput);
+        branchDiv.appendChild(addItemButton);
+        branchDiv.appendChild(itemList);
+        container.appendChild(branchDiv);
+      });
+    }
+
+    // تشغيل عند تحميل الصفحة
+    renderBranches();
+  </script>
+</body>
+</html>
